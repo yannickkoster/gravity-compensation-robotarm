@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+
+    class Motor_Prop {
+        constructor(idx, cx, cy, r, m, o){
+            this.idx = idx;
+            this.cx = cx;
+            this.cy = cy;
+            this.r = r;
+            this.m = m;
+            this.o = o;
+        }
+
+        add(svg){
+            return svg.append("circle")
+                .attr("cx", this.cx)
+                .attr("cy", this.cy)
+                .attr("r", this.r)
+                .attr("stroke", "blue")
+                .attr("stroke-width", 5)
+                .attr("fill", "none")
+                .attr("stroke-opacity", this.o)
+                ;
+        }
+
+    }
+
+    var motor1_prop = new Motor_Prop(1,100, 400 + LINKAGE_HEIGHT/2, MOTOR_RADIUS, 1, 1);
+    var motor2_prop = new Motor_Prop(2,100, 400 + LINKAGE_HEIGHT/2 - 10, MOTOR_RADIUS, 1, 0.3);
+
+
+    class Pulley_Prop {
+        constructor(idx, cx, cy, r, m,o){
+            this.idx = idx;
+            this.cx = cx;
+            this.cy = cy;
+            this.r = r;
+            this.m = m;
+            this.o = o;
+        }
+
+        add(svg){
+            return svg.append("circle")
+                .attr("cx", this.cx)
+                .attr("cy", this.cy)
+                .attr("r", this.r)
+                .attr("stroke", "blue")
+                .attr("stroke-width", 5)
+                .attr("fill", "none")
+                .attr("stroke-opacity", this.o)
+                ;
+        }
+    }
+
+
+
+</script>
+
+</body>
+</html>

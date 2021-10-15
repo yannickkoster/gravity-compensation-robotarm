@@ -9,64 +9,142 @@
   </head>
   <body>
     <script>
-      const WIDTH = 300;
-      var data = d3.range(0, 101, 1);
-      var units = '[cm]';
-      slider_T = new Slider("Time", data, WIDTH, 50, "d", units);
-      const FPS = 30;
+
+
+
 
       /*
-      constructing a linkage rather than whole arm for simplicity
+      GLOBAL VARS
        */
-      const LENGTH1 = 100; // yk length of linkage 1
+
+      const WIDTH = 300;
+
+      const LENGTH_MAX = 200; // yk max length of linkage 1
+      const LENGTH_START = 100; // yk min length of linkage 1
+
+      var data = d3.range(0, LENGTH_MAX + 1, 1);
+      var units = '[cm]';
+
+      const FPS = 30;
+
       const LINKAGE_HEIGHT = 10;
       const MOTOR_RADIUS = 20;
-      const MAX_TORQUE_1 = 10; // max torque for QDD for 30 seconds
+      const MAX_TORQUE = 10; // max torque for QDD for 30 seconds
+      const PULLEY_RADIUS = 30;
+      const PAYLOAD_SIZE = 50;
+      const PAYLOAD_MASS = 0.5; // in kg
+
+      /* SLIDER */
+
+      slider_T = new Slider("Time", data, WIDTH, LENGTH_START, "d", units);
+
+      /*SVG*/
+
       var svg = d3.select("body").append("svg")
         .attr("width", 1000)
         .attr("height", 500);
 
-
-      var linkage = svg.append("rect")
-        .attr("width", LENGTH1)
-        .attr("height", LINKAGE_HEIGHT)
-        .attr("x", 100)
-        .attr("y", 400);
-
-      var motor = svg.append("circle")
-        .attr("cx", 100)
-        .attr("cy", 400 + LINKAGE_HEIGHT/2)
-        .attr("r", MOTOR_RADIUS);
-
-      const MASS2 = 0.5; // in kg
-
-      var motor2 = svg.append("circle")
-        .attr("cx", 100 + LENGTH1)
-        .attr("cy", 400 + LINKAGE_HEIGHT/2)
-        .attr("r", MOTOR_RADIUS);
-
+      /* torque calc */
       // l1 is in cm
       function torque(l1, m2){
         const GRAVITY = 9.81; // in kg/m²
         return l1/100 * m2 * GRAVITY;
       }
 
-      var text1 = svg.append("text")
-        .attr("dominant-baseline", "middle")
-        .append("tspan")
-        .attr("x", 100)
-        .attr("y", 350)
-        .attr("style", "font-family: Helvetica, Arial, sans-serif;")
-        .text("t1=" + torque(LENGTH1, MASS2)/MAX_TORQUE_1);
+      /*functions to create objects*/
+
+      function add_circle(cx,cy,r,m,color,o){
+        return svg.append("circle")
+                .attr("cx", cx)
+                .attr("cy", cy)
+                .attr("r", r)
+                .attr("stroke", color)
+                .attr("stroke-width", 5)
+                .attr("fill", "none")
+                .attr("stroke-opacity", o)
+                ;
+      }
+
+      function add_line(x1,y1,x2,y2,s, o){
+        return svg.append("line")
+                .attr("x1", x1)
+                .attr("y1", y1)
+                .attr("x2", x2)
+                .attr("y2", y2)
+                .attr("stroke", s)
+                .attr("stroke-width", 5)
+                .attr("stroke-opacity", o)
+                ;
+      }
+
+      function add_rect(x,y,l, h,color){
+        return svg.append("rect")
+                .attr("width", l)
+                .attr("height", h)
+                .attr("x", x)
+                .attr("y", y)
+                .attr("stroke", color)
+                .attr("stroke-width", 5)
+                ;
+      }
+
+      function add_text(x,y,t){
+        return svg.append("text")
+                .attr("dominant-baseline", "middle")
+                .append("tspan")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("style", "font-family: Helvetica, Arial, sans-serif;")
+                .text(t)
+        ;
+      }
+
+      var torque_load = add_text(600,350,"load torque 1 = " + torque(LENGTH_START, PAYLOAD_MASS) + " Nm");
+      var torque_ut = add_text(600,400,"utilization of torque 1 = " + 100*torque(LENGTH_START, PAYLOAD_MASS)/MAX_TORQUE + "%");
+
+      /*creating objects*/
+
+      var motor1 = add_circle(100, 400 + LINKAGE_HEIGHT/2, MOTOR_RADIUS, 1, "black", 1);
+      var motor2 = add_circle(100, 400 + LINKAGE_HEIGHT/2 - 10, MOTOR_RADIUS, 1, "black", 0.3);
+
+      var pulley1 = add_circle(250, 400 + LINKAGE_HEIGHT/2, PULLEY_RADIUS, 1, "blue", 1);
+      var pulley2 = add_circle(250, 400 + LINKAGE_HEIGHT/2 - 10, PULLEY_RADIUS, 1, "blue", 0.3);
+
+      var belt1_lower = add_line(100,400 + LINKAGE_HEIGHT/2 + MOTOR_RADIUS, 250, 400 + LINKAGE_HEIGHT/2 + PULLEY_RADIUS, "red", 1);
+      var belt1_upper = add_line(100,400 + LINKAGE_HEIGHT/2 - MOTOR_RADIUS, 250, 400 + LINKAGE_HEIGHT/2 - PULLEY_RADIUS, "red", 1);
+      var belt2_lower = add_line(100, 400 + LINKAGE_HEIGHT/2 + MOTOR_RADIUS - 10, 250, 400 + LINKAGE_HEIGHT/2 + PULLEY_RADIUS - 10, "red", 0.3);
+      var belt2_upper = add_line(100,400 + LINKAGE_HEIGHT/2 - MOTOR_RADIUS - 10, 250, 400 + LINKAGE_HEIGHT/2 - PULLEY_RADIUS - 10, "red", 0.3);
+
+      var bevel = add_line(250, 400 + LINKAGE_HEIGHT/2 + PULLEY_RADIUS - 10, 250, 400 + LINKAGE_HEIGHT/2 - PULLEY_RADIUS + 10, "blue", 1);
+
+      var linkage1 = add_rect(250,
+              400 + LINKAGE_HEIGHT/2 - 2.5,
+              LENGTH_START,
+              5,
+              "black"
+      );
+
+      var payload = add_rect(250 + LENGTH_START - PAYLOAD_SIZE/2,
+              400 + LINKAGE_HEIGHT/2 - PAYLOAD_SIZE/2,
+              PAYLOAD_SIZE,
+              PAYLOAD_SIZE,
+              "black"
+      );
 
 
-
+      /* kinematics */
       d3.interval(function(elapsed){
         console.log(slider_T.value)
-          linkage.attr("width", slider_T.value)
-          motor2.attr("cx", 100+slider_T.value)
-          text1.text("utilization of torque 1 = " + torque(slider_T.value, MASS2) / MAX_TORQUE_1)
+        linkage1.attr("width", slider_T.value)
+
+
+        payload.attr("x", slider_T.value + 250 - PAYLOAD_SIZE/2)
+        torque_ut.text("utilization of torque 1 = " + 100*torque(slider_T.value, PAYLOAD_MASS)/MAX_TORQUE + "%")
+        torque_load.text("load torque 1 = " + torque(slider_T.value, PAYLOAD_MASS) + " Nm")
+
+
       }, (1/FPS)*1e3);
+
 
 
 
