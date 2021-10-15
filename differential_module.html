@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slider test</title>
+    <script src="./d3.min.js"></script>
+    <script type="application/javascript" src="./UI_2.js"></script>
+  </head>
+  <body>
+    <script>
+      const WIDTH = 300;
+      var data = d3.range(0, 101, 1);
+      var units = '[cm]';
+      slider_T = new Slider("Time", data, WIDTH, 50, "d", units);
+      const FPS = 30;
+
+      /*
+      constructing a linkage rather than whole arm for simplicity
+       */
+      const LENGTH1 = 100; // yk length of linkage 1
+      const LINKAGE_HEIGHT = 10;
+      const MOTOR_RADIUS = 20;
+      const MAX_TORQUE_1 = 10; // max torque for QDD for 30 seconds
+      var svg = d3.select("body").append("svg")
+        .attr("width", 1000)
+        .attr("height", 500);
+
+
+      var linkage = svg.append("rect")
+        .attr("width", LENGTH1)
+        .attr("height", LINKAGE_HEIGHT)
+        .attr("x", 100)
+        .attr("y", 400);
+
+      var motor = svg.append("circle")
+        .attr("cx", 100)
+        .attr("cy", 400 + LINKAGE_HEIGHT/2)
+        .attr("r", MOTOR_RADIUS);
+
+      const MASS2 = 0.5; // in kg
+
+      var motor2 = svg.append("circle")
+        .attr("cx", 100 + LENGTH1)
+        .attr("cy", 400 + LINKAGE_HEIGHT/2)
+        .attr("r", MOTOR_RADIUS);
+
+      // l1 is in cm
+      function torque(l1, m2){
+        const GRAVITY = 9.81; // in kg/m²
+        return l1/100 * m2 * GRAVITY;
+      }
+
+      var text1 = svg.append("text")
+        .attr("dominant-baseline", "middle")
+        .append("tspan")
+        .attr("x", 100)
+        .attr("y", 350)
+        .attr("style", "font-family: Helvetica, Arial, sans-serif;")
+        .text("t1=" + torque(LENGTH1, MASS2)/MAX_TORQUE_1);
+
+
+
+      d3.interval(function(elapsed){
+        console.log(slider_T.value)
+          linkage.attr("width", slider_T.value)
+          motor2.attr("cx", 100+slider_T.value)
+          text1.text("utilization of torque 1 = " + torque(slider_T.value, MASS2) / MAX_TORQUE_1)
+      }, (1/FPS)*1e3);
+
+
+
+    </script>
+  </body>
+</html>
