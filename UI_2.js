@@ -21,6 +21,8 @@ class Slider {
     // Slider
     this.slider_width = SLIDER_WIDTH;
     const CONTAINER_WIDTH = this.slider_width + 2*HANDLE_R;
+    /*const CONTAINER_WIDTH = 100;
+    const CONTAINER_HEIGHT = 500;*/
     const CONTAINER_HEIGHT = 2*(2*HANDLE_R);
     this.slider_x_offset = HANDLE_R;
     const SLIDER_Y_OFFSET = 0;
