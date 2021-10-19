@@ -36,19 +36,16 @@
       const PAYLOAD_MASS = 500; // in g
       const PAYLOAD_MASS_MAX = 1000; // in kg
 
-      const GEAR_REDUCTION = 6;
-      const MAX_GEAR_REDUCTION = 10;
-
       var data_mass = d3.range(0, PAYLOAD_MASS_MAX + 1, 1);
 
       /* SLIDER */
 
-      slider_T = new Slider("payload distance", data, WIDTH, LENGTH_START, "d", units);
-      slider_mass = new Slider("payload mass", data_mass, WIDTH, PAYLOAD_MASS, "d", units_mass);
+      slider_T = new Slider("Length", data, WIDTH, LENGTH_START, "d", units);
+      slider_mass = new Slider("Mass", data_mass, WIDTH, PAYLOAD_MASS, "d", units_mass);
 
       /*SVG*/
 
-      let svg = d3.select("body").append("svg")
+      var svg = d3.select("body").append("svg")
         .attr("width", 1000)
         .attr("height", 500);
 
@@ -108,6 +105,8 @@
         ;
       }
 
+      var torque_load = add_text(600,350,"load torque = " + torque(LENGTH_START, PAYLOAD_MASS) + " Nm");
+      var torque_ut = add_text(600,400,"utilization of torque 1 = " + 100*torque(LENGTH_START, PAYLOAD_MASS)/MAX_TORQUE + "%");
 
       /*creating objects*/
 
@@ -124,8 +123,6 @@
 
       var bevel = add_line(250, 400 + LINKAGE_HEIGHT/2 + PULLEY_RADIUS - 10, 250, 400 + LINKAGE_HEIGHT/2 - PULLEY_RADIUS + 10, "blue", 1);
 
-
-
       var linkage1 = add_rect(250,
               400 + LINKAGE_HEIGHT/2 - 2.5,
               LENGTH_START,
@@ -140,29 +137,16 @@
               "black"
       );
 
-      var torque_load = add_text(600,350,"load torque at differential = " + torque(LENGTH_START, PAYLOAD_MASS) + " Nm");
-      var torque_ut = add_text(600,400,"torque utilization per motor = " + 100*torque(LENGTH_START, PAYLOAD_MASS)/MAX_TORQUE + "%");
-
-      var motor_txt = add_text(50, 350, "motor 1, motor 2");
-      var belt_txt = add_text(150, 450, "belt");
-      // var motor_txt = add_text(200, 450, "pulley 1, pulley 2");
-      var motor_txt = add_text(200, 350, "differential joint");
-      var payload_txt = add_text(325, 350, "payload");
-
 
       /* kinematics */
       d3.interval(function(elapsed){
-        console.log(slider_T.value);
-        linkage1.attr("width", slider_T.value);
+        console.log(slider_T.value)
+        linkage1.attr("width", slider_T.value)
 
-        let side = PAYLOAD_SIZE * slider_mass.value / PAYLOAD_MASS_MAX;
-        payload.attr("width", side);
-        payload.attr("height", side);
-        payload.attr("x", slider_T.value + 250 - side/2);
-        payload.attr("y", 400 + LINKAGE_HEIGHT/2 - side/2);
 
-        torque_ut.text("torque utilization per motor = " + 100*torque(slider_T.value, slider_mass.value)/MAX_TORQUE + "%");
-        torque_load.text("load torque at differential joint = " + torque(slider_T.value, slider_mass.value) + " Nm");
+        payload.attr("x", slider_T.value + 250 - PAYLOAD_SIZE/2)
+        torque_ut.text("utilization of torque 1 = " + 100*torque(slider_T.value, slider_mass.value)/MAX_TORQUE + "%")
+        torque_load.text("load torque1 = " + torque(slider_T.value, slider_mass.value) + " Nm")
 
 
       }, (1/FPS)*1e3);
