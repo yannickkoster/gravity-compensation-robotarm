@@ -63,13 +63,26 @@
 
 
       /*SVG*/
+      const SVG_CONTAINER_WIDTH = 1350;
+      const SVG_CONTAINER_HEIGHT = 500;
+
       let svg_container = d3.select("body").append("svg")
-              .attr("width", 1350)
-              .attr("height", 500)
+              .attr("width", SVG_CONTAINER_WIDTH)
+              .attr("height", SVG_CONTAINER_HEIGHT)
       ;
 
-      /*let g1 = svg_container.append("g");
-      let g2 = svg_container.append("g");*/
+
+      const G_GEOMETRY_START = SVG_CONTAINER_WIDTH / 3;
+      const G_GEOMETRY_STR = "translate(" + String(G_GEOMETRY_START) + ",0)";
+      let g_geometry = svg_container.append("g")
+        .attr("transform", G_GEOMETRY_STR)
+      ;
+
+      const G_OUTPUT_START = SVG_CONTAINER_WIDTH*2/3;
+      const G_OUTPUT_STR = "translate(" + String(G_OUTPUT_START) + ",0)";
+      let g_output = svg_container.append("g")
+        .attr("transform", G_OUTPUT_STR )
+      ;
 
 
 
@@ -77,19 +90,16 @@
       slider_mass = new Slider("payload mass", data_mass, WIDTH, PAYLOAD_MASS, "d", units_mass);
 
 
-      const SVG_CONTAINER_WIDTH = 1836;
-      const SVG_CONTAINER_HEIGHT = 1500;
 
 
-
-      let svg_geometry = d3.select("body").append("svg")
+/*      let svg_geometry = d3.select("body").append("svg")
         .attr("width", 1000) // 1000
         .attr("height", 500) // 500
       ;
 
       let svg_output = d3.select("body").append("svg")
         .attr("width", 500) // 500
-        .attr("height", 300); // 300
+        .attr("height", 300); // 300*/
 
             /* torque calc */
       // l1 is in cm
@@ -152,29 +162,29 @@
 
       /*creating objects*/
 
-      var motor1 = add_circle(svg_geometry,MOTOR_POS_X, MOTOR_POS_Y + LINKAGE_HEIGHT/2, MOTOR_RADIUS, 1, "black", 1);
-      var motor2 = add_circle(svg_geometry,MOTOR_POS_X, MOTOR_POS_Y + LINKAGE_HEIGHT/2 - 10, MOTOR_RADIUS, 1, "black", 0.3);
+      var motor1 = add_circle(g_geometry,MOTOR_POS_X, MOTOR_POS_Y + LINKAGE_HEIGHT/2, MOTOR_RADIUS, 1, "black", 1);
+      var motor2 = add_circle(g_geometry,MOTOR_POS_X, MOTOR_POS_Y + LINKAGE_HEIGHT/2 - 10, MOTOR_RADIUS, 1, "black", 0.3);
 
-      var pulley1 = add_circle(svg_geometry,PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2, PULLEY_RADIUS, 1, "blue", 1);
-      var pulley2 = add_circle(svg_geometry,PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - 10, PULLEY_RADIUS, 1, "blue", 0.3);
+      var pulley1 = add_circle(g_geometry,PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2, PULLEY_RADIUS, 1, "blue", 1);
+      var pulley2 = add_circle(g_geometry,PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - 10, PULLEY_RADIUS, 1, "blue", 0.3);
 
-      var belt1_lower = add_line(svg_geometry,MOTOR_POS_X,MOTOR_POS_Y + LINKAGE_HEIGHT/2 + MOTOR_RADIUS, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 + PULLEY_RADIUS, "red", 1);
-      var belt1_upper = add_line(svg_geometry,MOTOR_POS_X,MOTOR_POS_Y + LINKAGE_HEIGHT/2 - MOTOR_RADIUS, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PULLEY_RADIUS, "red", 1);
-      var belt2_lower = add_line(svg_geometry,MOTOR_POS_X, MOTOR_POS_Y + LINKAGE_HEIGHT/2 + MOTOR_RADIUS - 10, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 + PULLEY_RADIUS - 10, "red", 0.3);
-      var belt2_upper = add_line(svg_geometry,MOTOR_POS_X,MOTOR_POS_Y + LINKAGE_HEIGHT/2 - MOTOR_RADIUS - 10, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PULLEY_RADIUS - 10, "red", 0.3);
+      var belt1_lower = add_line(g_geometry,MOTOR_POS_X,MOTOR_POS_Y + LINKAGE_HEIGHT/2 + MOTOR_RADIUS, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 + PULLEY_RADIUS, "red", 1);
+      var belt1_upper = add_line(g_geometry,MOTOR_POS_X,MOTOR_POS_Y + LINKAGE_HEIGHT/2 - MOTOR_RADIUS, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PULLEY_RADIUS, "red", 1);
+      var belt2_lower = add_line(g_geometry,MOTOR_POS_X, MOTOR_POS_Y + LINKAGE_HEIGHT/2 + MOTOR_RADIUS - 10, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 + PULLEY_RADIUS - 10, "red", 0.3);
+      var belt2_upper = add_line(g_geometry,MOTOR_POS_X,MOTOR_POS_Y + LINKAGE_HEIGHT/2 - MOTOR_RADIUS - 10, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PULLEY_RADIUS - 10, "red", 0.3);
 
-      var bevel = add_line(svg_geometry,PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 + PULLEY_RADIUS - 10, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PULLEY_RADIUS + 10, "blue", 1);
+      var bevel = add_line(g_geometry,PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 + PULLEY_RADIUS - 10, PULLEY_POS_X, PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PULLEY_RADIUS + 10, "blue", 1);
 
 
 
-      let linkage1 = add_rect(svg_geometry,PULLEY_POS_X,
+      let linkage1 = add_rect(g_geometry,PULLEY_POS_X,
               PULLEY_POS_Y + LINKAGE_HEIGHT/2 - 2.5,
               LENGTH_START,
               5,
               "black"
       );
 
-      var payload = add_rect(svg_geometry,PULLEY_POS_X + LENGTH_START - PAYLOAD_SIZE/2,
+      var payload = add_rect(g_geometry,PULLEY_POS_X + LENGTH_START - PAYLOAD_SIZE/2,
               PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PAYLOAD_SIZE/2,
               PAYLOAD_SIZE,
               PAYLOAD_SIZE,
@@ -182,13 +192,13 @@
       );
 
 
-      var torque_load = add_text(svg_output,TORQUE_LOAD_POS_X,TORQUE_LOAD_POS_Y,"load torque at differential = " + torque(LENGTH_START, PAYLOAD_MASS) + " Nm");
-      var torque_ut = add_text(svg_output,TORQUE_UT_POS_X,TORQUE_UT_POS_Y,"torque utilization per motor = " + 100*torque(LENGTH_START, PAYLOAD_MASS)/MAX_TORQUE + "%");
+      var torque_load = add_text(g_output,TORQUE_LOAD_POS_X,TORQUE_LOAD_POS_Y,"load torque at differential = " + torque(LENGTH_START, PAYLOAD_MASS) + " Nm");
+      var torque_ut = add_text(g_output,TORQUE_UT_POS_X,TORQUE_UT_POS_Y,"torque utilization per motor = " + 100*torque(LENGTH_START, PAYLOAD_MASS)/MAX_TORQUE + "%");
 
-      var motor_txt = add_text(svg_geometry,TEXT_MOTORS_POS_X, TEXT_MOTORS_POS_Y, "motor 1, motor 2");
-      var belt_txt = add_text(svg_geometry,TEXT_BELT_POS_X, TEXT_BELT_POS_Y, "belt");
-      var diff_txt = add_text(svg_geometry,TEXT_DIFF_POS_X, TEXT_DIFF_POS_Y, "differential joint");
-      var payload_txt = add_text(svg_geometry,TEXT_PAYLOAD_POS_X, TEXT_PAYLOAD_POS_Y, "payload");
+      var motor_txt = add_text(g_geometry,TEXT_MOTORS_POS_X, TEXT_MOTORS_POS_Y, "motor 1, motor 2");
+      var belt_txt = add_text(g_geometry,TEXT_BELT_POS_X, TEXT_BELT_POS_Y, "belt");
+      var diff_txt = add_text(g_geometry,TEXT_DIFF_POS_X, TEXT_DIFF_POS_Y, "differential joint");
+      var payload_txt = add_text(g_geometry,TEXT_PAYLOAD_POS_X, TEXT_PAYLOAD_POS_Y, "payload");
 
 
       /* kinematics */
