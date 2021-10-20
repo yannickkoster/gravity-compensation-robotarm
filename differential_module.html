@@ -51,7 +51,7 @@
 
       /*position of elements in svg*/
       const MOTOR_POS_X = 100;
-      const MOTOR_POS_Y = 100;
+      const MOTOR_POS_Y = 150;
       const PULLEY_POS_X = 250;
       const PULLEY_POS_Y = MOTOR_POS_Y;
 
@@ -63,8 +63,10 @@
       const TEXT_DIFF_POS_Y = TEXT_MOTORS_POS_Y;
       const TEXT_PAYLOAD_POS_X = 325;
       const TEXT_PAYLOAD_POS_Y = TEXT_MOTORS_POS_Y;
-
       const TEXT_SPACING_Y = 50;
+      const TEXT_TITLE_POS_X = 15;
+      const TEXT_TITLE_POS_Y = 40;
+
       const TORQUE_LOAD_POS_X = 100; // 600
       const TORQUE_LOAD_POS_Y = 40; // 350
       const TORQUE_LOAD_Y = 0;
@@ -95,21 +97,27 @@
               .attr("height", SVG_CONTAINER_HEIGHT)
       ;
 
+      const G_TITLE_START = 0;
+      const G_TITLE_STR = "translate(" + String(G_TITLE_START) + ",0)";
+      let g_title = svg_container.append("g")
+        .attr("transform", G_TITLE_STR)
+      ;
+
       const G_SLIDER_START = 0;
-      const G_SLIDER_STR = "translate(" + String(G_SLIDER_START) + ",0)";
+      const G_SLIDER_STR = "translate(" + String(G_SLIDER_START) + "," + String(TEXT_SPACING_Y) + ")";
       let g_slider = svg_container.append("g")
         .attr("transform", G_SLIDER_STR)
       ;
 
 
       const G_GEOMETRY_START = SLIDER_WIDTH;
-      const G_GEOMETRY_STR = "translate(" + String(G_GEOMETRY_START) + ",0)";
+      const G_GEOMETRY_STR = "translate(" + String(G_GEOMETRY_START) + "," + String(TEXT_SPACING_Y) + ")";
       let g_geometry = svg_container.append("g")
         .attr("transform", G_GEOMETRY_STR)
       ;
 
       const G_OUTPUT_START = SVG_CONTAINER_WIDTH*1/2;
-      const G_OUTPUT_STR = "translate(" + String(G_OUTPUT_START) + ",0)";
+      const G_OUTPUT_STR = "translate(" + String(G_OUTPUT_START) + "," + String(TEXT_SPACING_Y) + ")";
       let g_output = svg_container.append("g")
         .attr("transform", G_OUTPUT_STR )
       ;
@@ -233,6 +241,10 @@
         return (Math.round(x * 100)/100).toFixed(2);
       }
 
+      let title_txt = add_text(g_title,TEXT_TITLE_POS_X, TEXT_TITLE_POS_Y, "Gravity Compensation for Differential Joint")
+        .attr("font-weight","bold")
+        .attr("font-size", "larger")
+      ;
 
       let torque_load_txt = add_text(g_output,TORQUE_LOAD_POS_X,TORQUE_LOAD_POS_Y,"load torque at differential");
       torque_load_txt.attr("font-weight","bold");
@@ -241,14 +253,14 @@
 
       let torque_ut_txt = add_text(g_output,TORQUE_UT_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_Y * TEXT_SPACING_Y,"torque utilization per motor");
       torque_ut_txt.attr("font-weight","bold");
-      let torque_ut_formula_txt = add_text(g_output,TORQUE_LOAD_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque / peak_torque / 2 * 100%");
+      let torque_ut_formula_txt = add_text(g_output,TORQUE_LOAD_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque / transmission_ratio / peak_torque_per_motor / 2 * 100%");
       let torque_ut_value_txt = add_text(g_output,TORQUE_UT_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_VAL * TEXT_SPACING_Y,"= " + rounding(100*torque_calc(LENGTH_START, PAYLOAD_MASS)/torque_max/2) + "%");
 
 
-      var motor_txt = add_text(g_geometry,TEXT_MOTORS_POS_X, TEXT_MOTORS_POS_Y, "motor 1, motor 2");
-      var belt_txt = add_text(g_geometry,TEXT_BELT_POS_X, TEXT_BELT_POS_Y, "belt");
-      var diff_txt = add_text(g_geometry,TEXT_DIFF_POS_X, TEXT_DIFF_POS_Y, "differential joint");
-      var payload_txt = add_text(g_geometry,TEXT_PAYLOAD_POS_X, TEXT_PAYLOAD_POS_Y, "payload");
+      let motor_txt = add_text(g_geometry,TEXT_MOTORS_POS_X, TEXT_MOTORS_POS_Y, "motor 1, motor 2");
+      let belt_txt = add_text(g_geometry,TEXT_BELT_POS_X, TEXT_BELT_POS_Y, "belt");
+      let diff_txt = add_text(g_geometry,TEXT_DIFF_POS_X, TEXT_DIFF_POS_Y, "differential joint");
+      let payload_txt = add_text(g_geometry,TEXT_PAYLOAD_POS_X, TEXT_PAYLOAD_POS_Y, "payload");
 
 
       /* kinematics */
@@ -272,6 +284,19 @@
         torque_ut_value_txt.text("= " + rounding(100*torque_val/torque_max/2) + "%");
         // torque_ut_txt.text("torque utilization per motor = " + rounding(100*torque_val/torque_max/2) + "%"); // = load_torque / peak_torque / 2 * 100
 
+        let pulley_r = (1 + slider_gear_reduction.value/10) * MOTOR_RADIUS;
+        pulley1.attr("r",pulley_r);
+        pulley2.attr("r",pulley_r);
+
+        belt1_lower.attr("y2",PULLEY_POS_Y + LINKAGE_HEIGHT/2 + pulley_r);
+        belt1_upper.attr("y2",PULLEY_POS_Y + LINKAGE_HEIGHT/2 - pulley_r);
+        belt2_lower.attr("y2",PULLEY_POS_Y + LINKAGE_HEIGHT/2 + pulley_r - 10);
+        belt2_upper.attr("y2",PULLEY_POS_Y + LINKAGE_HEIGHT/2 - pulley_r - 10);
+        /*
+        , "red", 0.3);
+        , "red", 0.3);
+
+*/
 
       }, (1/FPS)*1e3);
 
