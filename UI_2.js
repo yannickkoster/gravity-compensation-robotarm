@@ -1,5 +1,5 @@
 class Slider {
-  constructor(ID, DATA, SLIDER_WIDTH, DEFAULT, FORMAT, UNITS) {
+  constructor(ID, DATA, SLIDER_WIDTH, DEFAULT, FORMAT, UNITS, G, N) {
     // Replace all spaces with underscores in the CSS ID, else it breaks
     this.CSS_ID = ID.replace(/ /g, '_').toLowerCase();
     // Data
@@ -36,14 +36,19 @@ class Slider {
       .range([this.min, this.max]);
 
     // Create the SVG slider
-    const CONTAINER = d3.select("body")
+    /*const CONTAINER = d3.select("body")
       .selectAll("#slider-container_" + this.CSS_ID)
       .data(["slider-container_" + this.CSS_ID])
       .enter()
       .append("svg")
       .attr("id", function(d){ return d; })
       .attr("width", CONTAINER_WIDTH)
-      .attr("height", CONTAINER_HEIGHT);
+      .attr("height", CONTAINER_HEIGHT);*/
+    const CONTAINER = G.append("svg")
+        .attr("id", function(d){ return d; })
+        .attr("width", CONTAINER_WIDTH)
+        .attr("height", CONTAINER_HEIGHT)
+        .attr("y", N*CONTAINER_HEIGHT);
 
     // Create a textbox for displaying the slider value and write the value to it
     const TEXT = CONTAINER.append("text")
