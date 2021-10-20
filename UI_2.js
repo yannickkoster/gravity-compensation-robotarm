@@ -118,7 +118,9 @@ class Slider {
   }
   write_value(value) {
     // Write number to text box
+
     return d3.format(this.format)(value) + this.units;
+
   }
   slider_left_width(x) {
     // Adjust the size of the left-rectangle of the slider
