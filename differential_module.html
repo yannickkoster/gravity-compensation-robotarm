@@ -50,6 +50,15 @@
 
 
       /*position of elements in svg*/
+      const SVG_CONTAINER_WIDTH = 1800;
+      const SLIDER_WIDTH = 330;
+      const SVG_CONTAINER_HEIGHT = 500;
+      const G_OUTPUT_START = SVG_CONTAINER_WIDTH*5/12;
+      const G_TITLE_START = 0;
+      const G_SLIDER_START = 0;
+      const G_GEOMETRY_START = SLIDER_WIDTH;
+
+
       const MOTOR_POS_X = 100;
       const MOTOR_POS_Y = 150;
       const PULLEY_POS_X = 250;
@@ -87,36 +96,35 @@
       const LOAD_UT_VALUE_POS_Y = 190;
 
 
-      /*SVG*/
-      const SVG_CONTAINER_WIDTH = 1350;
-      const SLIDER_WIDTH = 330;
-      const SVG_CONTAINER_HEIGHT = 500;
+      /*SVGf and groups*/
+
+
 
       let svg_container = d3.select("body").append("svg")
               .attr("width", SVG_CONTAINER_WIDTH)
               .attr("height", SVG_CONTAINER_HEIGHT)
       ;
 
-      const G_TITLE_START = 0;
+
       const G_TITLE_STR = "translate(" + String(G_TITLE_START) + ",0)";
       let g_title = svg_container.append("g")
         .attr("transform", G_TITLE_STR)
       ;
 
-      const G_SLIDER_START = 0;
+
       const G_SLIDER_STR = "translate(" + String(G_SLIDER_START) + "," + String(TEXT_SPACING_Y) + ")";
       let g_slider = svg_container.append("g")
         .attr("transform", G_SLIDER_STR)
       ;
 
 
-      const G_GEOMETRY_START = SLIDER_WIDTH;
+
       const G_GEOMETRY_STR = "translate(" + String(G_GEOMETRY_START) + "," + String(TEXT_SPACING_Y) + ")";
       let g_geometry = svg_container.append("g")
         .attr("transform", G_GEOMETRY_STR)
       ;
 
-      const G_OUTPUT_START = SVG_CONTAINER_WIDTH*1/2;
+
       const G_OUTPUT_STR = "translate(" + String(G_OUTPUT_START) + "," + String(TEXT_SPACING_Y) + ")";
       let g_output = svg_container.append("g")
         .attr("transform", G_OUTPUT_STR )
@@ -127,7 +135,7 @@
 
       slider_mass = new Slider("payload mass", data_mass, WIDTH, PAYLOAD_MASS, "d", units_mass, g_slider,0.5);
       slider_T = new Slider("payload distance", data, WIDTH, LENGTH_START, "d", units, g_slider,1.5);
-      slider_gear_reduction = new Slider("transmission ratio", data_gear_reduction, WIDTH, GEAR_REDUCTION, "d", units_gear_reduction, g_slider,3.5);
+      slider_gear_reduction = new Slider("transmission ratio", data_gear_reduction, WIDTH, GEAR_REDUCTION, ".1f", units_gear_reduction, g_slider,3.5);
       slider_torque_peak = new Slider("peak torque per motor", data_torque_peak, WIDTH, torque_peak, ".2f", units_torque, g_slider,4.5);
 
 
@@ -253,13 +261,17 @@
 
       let torque_ut_txt = add_text(g_output,TORQUE_UT_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_Y * TEXT_SPACING_Y,"torque utilization per motor");
       torque_ut_txt.attr("font-weight","bold");
-      let torque_ut_formula_txt = add_text(g_output,TORQUE_LOAD_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque / transmission_ratio / peak_torque_per_motor / 2 * 100%");
+      let torque_ut_formula_txt = add_text(g_output,TORQUE_LOAD_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque / (transmission_ratio * peak_torque_per_motor * 2) * 100%");
       let torque_ut_value_txt = add_text(g_output,TORQUE_UT_POS_X,TORQUE_LOAD_POS_Y + TORQUE_UT_VAL * TEXT_SPACING_Y,"= " + rounding(100*torque_calc(LENGTH_START, PAYLOAD_MASS)/torque_max/2) + "%");
 
 
       let motor_txt = add_text(g_geometry,TEXT_MOTORS_POS_X, TEXT_MOTORS_POS_Y, "motor 1, motor 2");
-      let belt_txt = add_text(g_geometry,TEXT_BELT_POS_X, TEXT_BELT_POS_Y, "belt");
-      let diff_txt = add_text(g_geometry,TEXT_DIFF_POS_X, TEXT_DIFF_POS_Y, "differential joint");
+      let belt_txt = add_text(g_geometry,TEXT_BELT_POS_X, TEXT_BELT_POS_Y, "belt")
+        .attr("fill","red")
+      ;
+      let diff_txt = add_text(g_geometry,TEXT_DIFF_POS_X, TEXT_DIFF_POS_Y, "differential joint")
+        .attr("fill","blue")
+      ;
       let payload_txt = add_text(g_geometry,TEXT_PAYLOAD_POS_X, TEXT_PAYLOAD_POS_Y, "payload");
 
 
