@@ -1,5 +1,5 @@
 # 7 DoF Robot Arm
-![blue arm](/pictures/blue_arm.jpg)
+![blue arm](pictures/blue_arm.jpg)
 
 ## Joints
 
