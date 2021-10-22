@@ -317,7 +317,7 @@
   let qdd1_torque_load_formula_txt = add_text(g_output,
           QDD1_TORQUE_LOAD_POS_X,
           QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_LOAD_FORMULA * TEXT_SPACING_Y,
-          "= length_1 * (qdd2_mass + payload_mass) * gravity_const"
+          "= length_1 * qdd2_mass * gravity_const + (length_1 + length_2) * payload_mass * gravity_const"
   );
 
   let qdd1_torque_tot = torque_calc(LENGTH_START, QDD2_MASS + PAYLOAD_MASS);
@@ -374,7 +374,8 @@
     // console.log("linkage length = " + slider_linkage1.value);
     // console.log("qdd2 mass = " + QDD2_MASS);
     // console.log("qdd2_torque = " + qdd2_torque);
-    qdd1_torque_tot = torque_calc(slider_linkage1.value, slider_mass.value + QDD2_MASS);
+    qdd1_torque_tot = torque_calc(slider_linkage1.value, QDD2_MASS) + torque_calc(slider_linkage1.value + slider_linkage2.value, slider_mass.value);
+    // length_1 * qdd2_mass * gravity_const + (length_1 + length_2) * payload_mass * gravity_const
 
     // OUTPUT DISPLAYING
 
