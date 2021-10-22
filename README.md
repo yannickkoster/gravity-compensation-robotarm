@@ -3,13 +3,13 @@
 ## Joints
 
 ### Planetary Gear Joint
-[Gravity Compensation for Planetary Gear Joint](https://yannickkoster.github.io/gravity-compensation-robotarm/planetary_gear_module)
+[Gravity compensation for planetary gear joint](https://yannickkoster.github.io/gravity-compensation-robotarm/planetary_gear_module)
 
 ### Belt Joint
-[Gravity Compensation for Belt joint](https://yannickkoster.github.io/gravity-compensation-robotarm/belt_module.html)
+[Gravity compensation for belt joint](https://yannickkoster.github.io/gravity-compensation-robotarm/belt_module.html)
 
 ### Differential Joint
-[Gravity Compensation for Differential joint](https://yannickkoster.github.io/gravity-compensation-robotarm/differential_module.html)
+[Gravity compensation for differential joint](https://yannickkoster.github.io/gravity-compensation-robotarm/differential_module.html)
 
 ### Kinematics
 ```
