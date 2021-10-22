@@ -20,7 +20,7 @@
   const WIDTH = 300;
 
   const LENGTH_MAX = 200; // yk max length of linkage 1
-  const LENGTH_START = 100; // yk min length of linkage 1
+  const LENGTH_START = 150; // yk min length of linkage 1
 
   var data = d3.range(0, LENGTH_MAX + 1, 1);
   var units = ' cm';
@@ -35,6 +35,7 @@
 
   const TORQUE_PEAK = 1.7; // peak torque in Nm for 30s of mj5208 brushless motor
   const MOTOR2_RADIUS = 20;
+  const PULLEY_RADIUS = 30;
   const PAYLOAD_SIZE = 50;
   const PAYLOAD_MASS = 500; // in g
   const PAYLOAD_MASS_MAX = 1000; // in kg
@@ -61,21 +62,31 @@
 
   const MOTOR1_POS_X = 100;
   const MOTOR1_POS_Y = 150;
-  const MOTOR2_POS_X = 250;
-  const MOTOR2_POS_Y = MOTOR1_POS_Y;
+  const MOTOR2_POS_X = MOTOR1_POS_X;
+  const MOTOR2_POS_Y = MOTOR1_POS_Y - 10;
+
+  const PULLEY_POS_X = 250;
+  const PULLEY_POS_Y = MOTOR1_POS_Y;
 
   const TEXT_MOTOR1_POS_X = 75;
-  const TEXT_MOTOR1_POS_Y = 100;
+  const TEXT_MOTOR1_POS_Y = 90;
 
-  const TEXT_MOTOR2_POS_X = 150;
-  const TEXT_MOTOR2_POS_Y = TEXT_MOTOR1_POS_Y;
-  const TEXT_LINKAGE1_POS_X = (MOTOR1_POS_X + MOTOR2_POS_X) / 2 - 60;
-  const TEXT_LINKAGE1_POS_Y = 210;
-  const TEXT_PAYLOAD_POS_X = 250;
+
+
+  const TEXT_PULLEY_POS_X = 210;
+  const TEXT_PULLEY_POS_Y = TEXT_MOTOR1_POS_Y;
+  const TEXT_LENGTH_POS_X = PULLEY_POS_X - 40 ;
+  const TEXT_LENGTH_POS_Y = 210;
+  const TEXT_PAYLOAD_POS_X = 325;
   const TEXT_PAYLOAD_POS_Y = TEXT_MOTOR1_POS_Y;
   const TEXT_SPACING_Y = 50;
   const TEXT_TITLE_POS_X = 15;
   const TEXT_TITLE_POS_Y = 40;
+  const TEXT_BELT_POS_X = 150;
+  const TEXT_BELT_POS_Y = 155;
+
+  const TEXT_MOTOR2_POS_X = TEXT_MOTOR1_POS_X;
+  const TEXT_MOTOR2_POS_Y = TEXT_LENGTH_POS_Y;
 
   const QDD2_TORQUE_LOAD_POS_X = 100; // 600
   const QDD2_TORQUE_LOAD_POS_y = 40; // 350
@@ -149,11 +160,13 @@
 
 
   slider_mass = new Slider("payload mass", data_mass, WIDTH, PAYLOAD_MASS, "d", units_mass, g_slider,0.5);
-  slider_linkage2 = new Slider("length 2", data, WIDTH, LENGTH_START, "d", units, g_slider,1.5);
-  slider_linkage1 = new Slider("length 1", data, WIDTH, LENGTH_START, "d", units, g_slider,3.5);
+  slider_linkage2 = new Slider("length", data, WIDTH, LENGTH_START, "d", units, g_slider,1.5);
 
-  slider_gear_reduction1 = new Slider("transmission ratio 1", data_gear_reduction, WIDTH, GEAR_REDUCTION, ".1f", units_gear_reduction, g_slider,5.5);
-  slider_gear_reduction2 = new Slider("transmission ratio 2", data_gear_reduction, WIDTH, GEAR_REDUCTION, ".1f", units_gear_reduction, g_slider,6.5);
+  slider_linkage1 = new Slider("output pulley distance", data, WIDTH, LENGTH_START, "d", units, g_slider,3.5);
+
+
+  slider_gear_reduction1 = new Slider("gear ratio for motor 1", data_gear_reduction, WIDTH, GEAR_REDUCTION, ".1f", units_gear_reduction, g_slider,5.5);
+  slider_gear_reduction2 = new Slider("transmission ratio for belt", data_gear_reduction, WIDTH, GEAR_REDUCTION, ".1f", units_gear_reduction, g_slider,6.5);
   slider_torque_peak1 = new Slider("peak torque motor 1", data_torque_peak, WIDTH, TORQUE_PEAK, ".2f", units_torque, g_slider,7.5);
   slider_torque_peak2 = new Slider("peak torque motor 2", data_torque_peak, WIDTH, TORQUE_PEAK, ".2f", units_torque, g_slider,8.5);
 
@@ -216,6 +229,26 @@
             ;
   }
 
+
+  let belt1_lower = add_line(g_geometry,
+          MOTOR1_POS_X,
+          MOTOR1_POS_Y + LINKAGE_HEIGHT/2 + MOTOR1_RADIUS,
+          PULLEY_POS_X,
+          PULLEY_POS_Y + LINKAGE_HEIGHT/2 + PULLEY_RADIUS,
+          "red",
+          1
+  );
+  let belt1_upper = add_line(g_geometry,
+          MOTOR1_POS_X,
+          MOTOR1_POS_Y + LINKAGE_HEIGHT/2 - MOTOR1_RADIUS,
+          PULLEY_POS_X,
+          PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PULLEY_RADIUS,
+          "red",
+          1
+  );
+
+
+
   function rounding (x){
     return (Math.round(x * 100)/100).toFixed(2);
   }
@@ -226,28 +259,44 @@
   // GEOMETRY
   let motor1 = add_circle(g_geometry,MOTOR1_POS_X, MOTOR1_POS_Y + LINKAGE_HEIGHT/2, MOTOR1_RADIUS, 1, "black", 1);
 
-  let motor2 = add_circle(g_geometry,MOTOR2_POS_X, MOTOR2_POS_Y + LINKAGE_HEIGHT/2, MOTOR2_RADIUS, 1, "black", 1);
+  let motor2 = add_circle(g_geometry,
+          MOTOR2_POS_X,
+          MOTOR2_POS_Y + LINKAGE_HEIGHT/2,
+          MOTOR2_RADIUS,
+          1,
+          "black",
+          0.3);
 
 
-  let linkage1 = add_rect(g_geometry,
+  /*let linkage1 = add_rect(g_geometry,
           MOTOR1_POS_X,
           MOTOR1_POS_Y + LINKAGE_HEIGHT/2 - 2.5,
           MOTOR2_POS_X - MOTOR1_POS_X,
           5,
           "grey"
+  );*/
+
+  let pulley = add_circle(g_geometry,
+          PULLEY_POS_X,
+          PULLEY_POS_Y + LINKAGE_HEIGHT/2,
+          PULLEY_RADIUS,
+          1,
+          "blue",
+          1
   );
 
 
-  let linkage2 = add_rect(g_geometry,
-          MOTOR2_POS_X,
-          MOTOR2_POS_Y + LINKAGE_HEIGHT/2 - 2.5,
+
+  let length_geom = add_rect(g_geometry,
+          PULLEY_POS_X,
+          PULLEY_POS_Y + LINKAGE_HEIGHT/2 - 2.5,
           LENGTH_START,
           5,
-          "brown"
+          "black"
   );
 
-  let payload = add_rect(g_geometry,MOTOR2_POS_X + LENGTH_START - PAYLOAD_SIZE/2,
-          MOTOR2_POS_Y + LINKAGE_HEIGHT/2 - PAYLOAD_SIZE/2,
+  let payload = add_rect(g_geometry,PULLEY_POS_X + LENGTH_START - PAYLOAD_SIZE/2,
+          PULLEY_POS_Y + LINKAGE_HEIGHT/2 - PAYLOAD_SIZE/2,
           PAYLOAD_SIZE,
           PAYLOAD_SIZE,
           "black"
@@ -257,136 +306,192 @@
   // GEOMETRY TEXT
 
 
-  let title_txt = add_text(g_title,TEXT_TITLE_POS_X, TEXT_TITLE_POS_Y, "Gravity Compensation for Planetary Gear Joint")
+  let title_txt = add_text(g_title,TEXT_TITLE_POS_X, TEXT_TITLE_POS_Y, "Gravity Compensation for Belt Joint")
           .attr("font-weight","bold")
           .attr("font-size", "larger")
   ;
 
 
-  let motor1_txt = add_text(g_geometry,TEXT_MOTOR1_POS_X, TEXT_MOTOR1_POS_Y, "QDD 1");
-  let linkage1_txt = add_text(
-          g_geometry,
-          TEXT_LINKAGE1_POS_X,
-          TEXT_LINKAGE1_POS_Y,
-          "length 1"
-  );
-  linkage1_txt.attr("fill", "grey");
+  let motor1_txt = add_text(g_geometry,TEXT_MOTOR1_POS_X, TEXT_MOTOR1_POS_Y, "motor 1");
+  motor1_txt.attr("fill", "grey");
 
-  let motor2_txt = add_text(g_geometry,TEXT_MOTOR2_POS_X, TEXT_MOTOR2_POS_Y, "QDD 2");
+  let motor2_txt = add_text(
+          g_geometry,
+          TEXT_MOTOR2_POS_X,
+          TEXT_MOTOR2_POS_Y,
+          "motor 2"
+  );
+  motor2_txt.attr("fill", "black");
+
+
+
+  let pulley_txt = add_text(g_geometry,TEXT_PULLEY_POS_X, TEXT_PULLEY_POS_Y, "output pulley")
+    .attr("fill", "blue")
+  ;
+
+  let belt_txt = add_text(g_geometry,TEXT_BELT_POS_X, TEXT_BELT_POS_Y, "belt")
+          .attr("fill","red")
+  ;
 
 
   let length2_txt = add_text(
           g_geometry,
-          TEXT_LINKAGE1_POS_X + 100,
-          TEXT_LINKAGE1_POS_Y,
-          "length 2"
+          TEXT_LENGTH_POS_X + 100,
+          TEXT_LENGTH_POS_Y,
+          "length"
   );
-  length2_txt.attr("fill", "brown");
+  length2_txt.attr("fill", "black");
 
 
   let payload_txt = add_text(g_geometry,TEXT_PAYLOAD_POS_X, TEXT_PAYLOAD_POS_Y, "payload");
 
   // OUTPUT TEXT
 
-  // QDD 2
+  // motor 2
 
   // load torque
-  let qdd2_torque_load_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y,"load torque at QDD 2");
+  let qdd2_torque_load_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y,"load torque at output pulley");
   qdd2_torque_load_txt.attr("font-weight","bold");
-  let qdd2_torque_load_formula_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_LOAD_FORMULA * TEXT_SPACING_Y,"= length_2 * payload_mass * gravity_const");
+  let qdd2_torque_load_formula_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_LOAD_FORMULA * TEXT_SPACING_Y,"= length * payload_mass * gravity_const");
   let payload_torque = torque_calc(LENGTH_START, PAYLOAD_MASS);
-  let qdd2_torque_load_val_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_LOAD_VAL * TEXT_SPACING_Y,"= " + rounding(payload_torque) + " Nm");
+  let qdd2_torque_load_val_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_LOAD_VAL * TEXT_SPACING_Y,
+          // "= " + rounding(payload_torque) + " Nm"
+          ""
+  );
 
   // torque utilization
-  let qdd2_torque_ut_txt = add_text(g_output,QDD2_TORQUE_UT_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_UT * TEXT_SPACING_Y,"torque utilization of QDD 2");
+  let qdd2_torque_ut_txt = add_text(g_output,QDD2_TORQUE_UT_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_UT * TEXT_SPACING_Y,"torque utilization of motor 2");
   qdd2_torque_ut_txt.attr("font-weight","bold");
-  let qdd2_torque_ut_formula_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque_qdd2 / (transmission_ratio_2 * peak_torque_motor_2) * 100%");
+  let qdd2_torque_ut_formula_txt = add_text(g_output,QDD2_TORQUE_LOAD_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque_output_pulley / (transmission_ratio_belt * peak_torque_motor_2) * 100%");
   let qdd2_torque_ut = 100*payload_torque/(TORQUE_MAX);
-  let qdd2_torque_ut_value_txt = add_text(g_output,QDD2_TORQUE_UT_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_UT_VAL * TEXT_SPACING_Y,"= " + rounding(qdd2_torque_ut) + "%");
+  let qdd2_torque_ut_value_txt = add_text(g_output,QDD2_TORQUE_UT_POS_X,QDD2_TORQUE_LOAD_POS_y + QDD2_TORQUE_UT_VAL * TEXT_SPACING_Y,
+          // "= " + rounding(qdd2_torque_ut) + "%"
+          ""
+  );
 
 
-  // QDD 1
+  // motor 1
   // load torque
   let qdd1_torque_load_txt = add_text(
           g_output,
           QDD1_TORQUE_LOAD_POS_X,
           QDD1_TORQUE_LOAD_POS_y,
-          "load torque at QDD 1"
+          "load torque at motor 1"
   );
   qdd1_torque_load_txt.attr("font-weight","bold");
   let qdd1_torque_load_formula_txt = add_text(g_output,
           QDD1_TORQUE_LOAD_POS_X,
           QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_LOAD_FORMULA * TEXT_SPACING_Y,
-          "= length_1 * (qdd2_mass + payload_mass) * gravity_const"
+          "= output_pulley_distance * payload_mass * gravity_const"
   );
 
   let qdd1_torque_tot = torque_calc(LENGTH_START, QDD2_MASS + PAYLOAD_MASS);
   let qdd1_torque_load_value_txt = add_text(g_output,
           QDD1_TORQUE_LOAD_POS_X,
           QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_LOAD_VAL * TEXT_SPACING_Y,
-          "= " + rounding(qdd1_torque_tot) + " Nm"
+          ""
+          // "= " + rounding(qdd1_torque_tot) + " Nm"
   );
 
   // torque utilization
-  let qdd1_torque_ut_txt = add_text(g_output,QDD1_TORQUE_UT_POS_X,QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_UT * TEXT_SPACING_Y,"torque utilization of QDD 1");
+  let qdd1_torque_ut_txt = add_text(g_output,QDD1_TORQUE_UT_POS_X,QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_UT * TEXT_SPACING_Y,"torque utilization of motor 1");
   qdd1_torque_ut_txt.attr("font-weight","bold");
-  let qdd1_torque_ut_formula_txt = add_text(g_output,QDD1_TORQUE_LOAD_POS_X,QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque_qdd1 / (transmission_ratio_1 * peak_torque_motor_1) * 100%");
+  let qdd1_torque_ut_formula_txt = add_text(g_output,QDD1_TORQUE_LOAD_POS_X,QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_UT_FORMULA * TEXT_SPACING_Y,"= load_torque_motor_1 / (gear_ratio_motor_1 * peak_torque_motor_1) * 100%");
   let qdd1_torque_ut = 100*qdd1_torque_tot/(TORQUE_MAX);
-  let qdd1_torque_ut_value_txt = add_text(g_output,QDD1_TORQUE_UT_POS_X,QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_UT_VAL * TEXT_SPACING_Y,"= " + rounding(qdd1_torque_ut) + "%");
+  let qdd1_torque_ut_value_txt = add_text(g_output,QDD1_TORQUE_UT_POS_X,QDD1_TORQUE_LOAD_POS_y + QDD1_TORQUE_UT_VAL * TEXT_SPACING_Y,
+          // "= " + rounding(qdd1_torque_ut) + "%"
+          ""
+  );
 
   /* KINEMATICS */
   d3.interval(function(elapsed){
 
-    // GEOMETRY
-    let linkage1_length = (MOTOR2_POS_X - MOTOR1_POS_X) / LENGTH_MAX * slider_linkage1.value;
-    let motor2_pos_x = MOTOR1_POS_X + linkage1_length;
-    linkage1.attr("width", linkage1_length);
-    motor2.attr("cx", motor2_pos_x);
-    // motor2_txt.attr("x",motor2_pos_x - 20);
-    linkage2.attr("x", motor2_pos_x)
-    linkage2.attr("width", slider_linkage2.value);
+    // SLIDERS
 
-    let linkage2_pos_x_end = motor2_pos_x + slider_linkage2.value;
-    let side = PAYLOAD_SIZE * slider_mass.value / PAYLOAD_MASS_MAX;
-    payload.attr("width", side);
-    payload.attr("height", side);
-    payload.attr("x", linkage2_pos_x_end - side/2);
-    payload.attr("y", MOTOR2_POS_Y + LINKAGE_HEIGHT/2 - side/2);
-
-    let motor_r1 = (1 + slider_gear_reduction1.value/10) * MOTOR1_RADIUS;
-    let motor_r2 = (1 + slider_gear_reduction2.value/10) * MOTOR2_RADIUS;
-    motor1.attr("r",motor_r1);
-    motor2.attr("r",motor_r2);
-
-    // payload_txt.attr("x", linkage2_pos_x_end- PAYLOAD_SIZE/2);
-    // let text_linkage1_pos_x = (MOTOR1_POS_X + motor2_pos_x) / 2 - 20;
-    // linkage1_txt.attr("x", text_linkage1_pos_x);
-
-    // OUTPUT CALCULATIONS
+    let mass = slider_mass.value;
+    let l = slider_linkage2.value;
+    let d = slider_linkage1.value;
+    let g = slider_gear_reduction1.value;
+    let t = slider_gear_reduction2.value;
     let torque_peak1 = slider_torque_peak1.value;
     let torque_peak2 = slider_torque_peak2.value;
-    let torque_max1 = slider_gear_reduction1.value * torque_peak1;
-    let torque_max2 = slider_gear_reduction2.value * torque_peak2;
 
+    // GEOMETRY
+
+    // x scale of pulley and belt
+    // let linkage1_length = (PULLEY_POS_X - MOTOR1_POS_X) / LENGTH_MAX * d;
+    let linkage1_length = d;
+    let pulley_pos_x = MOTOR1_POS_X + linkage1_length;
+    pulley.attr("cx", pulley_pos_x);
+    belt1_lower.attr("x2",pulley_pos_x);
+    belt1_upper.attr("x2",pulley_pos_x);
+
+    // y scale of pulley and belt
+    let pulley_r = (1 + t/10) * MOTOR1_RADIUS;
+    pulley.attr("r",pulley_r);
+    belt1_lower.attr("y2",PULLEY_POS_Y + LINKAGE_HEIGHT/2 + pulley_r);
+    belt1_upper.attr("y2",PULLEY_POS_Y + LINKAGE_HEIGHT/2 - pulley_r);
+
+    // payload arm
+    length_geom.attr("x", pulley_pos_x);
+    length_geom.attr("width", l);
+
+    // payload size
+    let side = PAYLOAD_SIZE * mass / PAYLOAD_MASS_MAX;
+    payload.attr("width", side);
+    payload.attr("height", side);
+
+    // payload position
+    let linkage2_pos_x_end = pulley_pos_x + l;
+    payload.attr("x", linkage2_pos_x_end - side/2);
+    payload.attr("y", PULLEY_POS_Y + LINKAGE_HEIGHT/2 - side/2);
+
+
+    // OUTPUT
+
+    let torque_max2 = t * torque_peak2;
+    let torque_max1 = g * torque_peak1;
+
+    // torque motor 2
     payload_torque = torque_calc(slider_linkage2.value, slider_mass.value);
-    // console.log("payload torque = " + payload_torque); // ok
-
-    // console.log("linkage length = " + slider_linkage1.value);
-    // console.log("qdd2 mass = " + QDD2_MASS);
-    // console.log("qdd2_torque = " + qdd2_torque);
-    qdd1_torque_tot = torque_calc(slider_linkage1.value, slider_mass.value + QDD2_MASS);
-
-    // OUTPUT DISPLAYING
-
     qdd2_torque_load_val_txt.text("= " + rounding(payload_torque) + " Nm");
     qdd2_torque_ut_value_txt.text("= " + rounding(payload_torque/(torque_max2)*100) + "%");
 
+    // torque motor 1
+    qdd1_torque_tot = torque_calc(d, mass);
     qdd1_torque_load_value_txt.text("= " + rounding(qdd1_torque_tot) + " Nm");
     qdd1_torque_ut_value_txt.text("= " + rounding(qdd1_torque_tot/(torque_max1)*100) + "%");
 
+    /*
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+    /*
+
+   let motor_r1 = (1 + slider_gear_reduction1.value/10) * MOTOR1_RADIUS;
+   let motor_r2 = (1 + slider_gear_reduction2.value/10) * MOTOR2_RADIUS;
+   motor1.attr("r",motor_r1);
+   motor2.attr("r",motor_r2);
+
+   // payload_txt.attr("x", linkage2_pos_x_end- PAYLOAD_SIZE/2);
+    // let text_linkage1_pos_x = (MOTOR1_POS_X + motor2_pos_x) / 2 - 20;
+    // linkage1_txt.attr("x", text_linkage1_pos_x);
+
+    */
 
   }, (1/FPS)*1e3);
 
