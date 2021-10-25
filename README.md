@@ -1,7 +1,7 @@
-# 7 DoF Robot Arm
+# 7 DoF Quasi-Direct-Drive Robot Arm
 ![blue arm](pictures/blue_arm.png)
 
-## Joints
+## Types of possible Joints
 
 ### Planetary Gear Joint
 [Gravity compensation for planetary gear joint](https://yannickkoster.github.io/gravity-compensation-robotarm/planetary_gear_module)
